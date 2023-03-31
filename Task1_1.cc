@@ -42,6 +42,16 @@ void* keyGen(void* p){
 	pthread_exit(key);
 }
 
+void cleanChunks(ChunkList* list){
+	Chunk* t = list->head;
+	Chunk* next = NULL;
+	for (size_t i = 0; i < list->len; ++i){
+		next = t->next;
+		free(t);
+		t = next;
+	}
+}
+
 void* worker(void* context){
 	WorkerContext* locContext = (WorkerContext*)context;
 	Chunk* t_data = locContext->input->head;
@@ -68,7 +78,7 @@ void* worker(void* context){
 	locContext->output->tail = t_out;
 	printf("Worker with context %p is going to be set in waiting\n", (void*)context);
 	pthread_barrier_wait(locContext->barrier);
-	printf("Worker with context %p has woked up\n", (void*)context);
+	printf("Worker with context %p has woke up\n", (void*)context);
 	pthread_exit((void*)locContext->output);
 }
 
@@ -234,6 +244,7 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Error opening file %s.\n", params.path_out);
 		return 1;
 	}
+	//Write down output
 	for (long j = 0; j < N; ++j){
 		ChunkList* chunks = contexts[j]->output;
 		Chunk* t = chunks->head;
@@ -246,5 +257,17 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	fclose(fd_o);
+
+	//Clear memory on the heap
+	cleanChunks(&input_data_list);
+	cleanChunks(key);
+	free(key);
+	for (size_t j = 0; j < N; ++j){
+		cleanChunks(contexts[j]->output);
+		free(contexts[j]);
+		free(workers[j]);
+	}
+	free(contexts);
+	free(workers);
 	return EXIT_SUCCESS;
 }

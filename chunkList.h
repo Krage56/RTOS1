@@ -12,3 +12,5 @@ struct ChunkList{
 	size_t len;
 };
 
+//Clean data, doesn't delete container itself
+void cleanChunks(ChunkList* list);
