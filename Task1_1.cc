@@ -19,7 +19,7 @@ void* keyGen(void* p){
 	size_t count = 0;
 	size_t internal_count = 0;
 	key->len = 0;
-	while(count != params->len){
+	while(count < params->len){
 		if(internal_count <= MAX_DATA_SIZE - sizeof(long long)){
 			memcpy((void*)(t->data + internal_count), (void*)&start_x, sizeof(long long));
 			internal_count += sizeof(long long);
