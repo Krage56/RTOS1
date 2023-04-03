@@ -255,6 +255,8 @@ int main(int argc, char *argv[]) {
 			}
 			t = t->next;
 		}
+		free(contexts[j]->key);
+		free(contexts[j]->input);
 	}
 	fclose(fd_o);
 
@@ -269,5 +271,6 @@ int main(int argc, char *argv[]) {
 	}
 	free(contexts);
 	free(workers);
+	pthread_barrier_destroy(&barrier);
 	return EXIT_SUCCESS;
 }
